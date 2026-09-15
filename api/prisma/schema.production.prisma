@@ -1,0 +1,247 @@
+// AURA CAPILAR — modelo de datos (PRODUCCIÓN: PostgreSQL)
+// Generado a partir de schema.prisma. No editar a mano: correr scripts/sync-prod-schema.sh
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Configuración global de la tienda (fila única id = 1).
+/// Nombre, logo, colores, contacto, redes y selección del Home viven aquí, no en el código.
+model StoreSettings {
+  id                 Int      @id @default(1)
+  storeName          String   @default("AURA CAPILAR")
+  tagline            String   @default("")
+  logoUrl            String?
+  faviconUrl         String?
+  distributorNote    String?
+
+  // Marca visual
+  primaryColor       String   @default("#2B1E24")
+  accentColor        String   @default("#B7795E")
+  backgroundColor    String   @default("#FAF6F1")
+  surfaceColor       String   @default("#F1E6DC")
+  textColor          String   @default("#2B1E24")
+
+  // Regional
+  currency           String   @default("COP")
+  locale             String   @default("es-CO")
+  announcementText   String?
+
+  // Contacto y redes
+  whatsappNumber     String?
+  whatsappMessage    String?
+  instagramUrl       String?
+  facebookUrl        String?
+  tiktokUrl          String?
+  youtubeUrl         String?
+  email              String?
+  phone              String?
+  address            String?
+
+  // Home
+  featuredProductId  Int?
+  featuredProduct    Product? @relation(fields: [featuredProductId], references: [id], onDelete: SetNull)
+  featuredEyebrow    String?
+  favoritesTitle     String?
+  favoritesSubtitle  String?
+  categoriesTitle    String?
+  categoriesSubtitle String?
+
+  // Checkout
+  shippingFlat       Int      @default(0)
+  checkoutNote       String?
+  paymentsEnabled    Boolean  @default(false)
+
+  // SEO / footer
+  metaTitle          String?
+  metaDescription    String?
+  footerText         String?
+
+  updatedAt          DateTime @updatedAt
+}
+
+model MenuItem {
+  id       Int     @id @default(autoincrement())
+  label    String
+  href     String
+  position Int     @default(0)
+  active   Boolean @default(true)
+}
+
+model HeroSlide {
+  id                  Int      @id @default(autoincrement())
+  eyebrow             String?
+  title               String
+  subtitle            String?
+  mediaType           String   @default("image") // image | video | youtube
+  imageUrl            String?
+  mobileImageUrl      String?
+  videoUrl            String?
+  youtubeUrl          String?
+  buttonText          String?
+  buttonLink          String?
+  secondaryButtonText String?
+  secondaryButtonLink String?
+  textAlign           String   @default("left") // left | center | right
+  overlay             Int      @default(20) // 0-80 (%)
+  position            Int      @default(0)
+  active              Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Banner {
+  id         Int      @id @default(autoincrement())
+  title      String
+  subtitle   String?
+  imageUrl   String?
+  link       String?
+  buttonText String?
+  placement  String   @default("home") // home | shop | product
+  position   Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  imageUrl    String?
+  position    Int       @default(0)
+  active      Boolean   @default(true)
+  products    Product[]
+}
+
+model Product {
+  id               Int               @id @default(autoincrement())
+  name             String
+  slug             String            @unique
+  brand            String            @default("Milagros")
+  sku              String?
+  size             String?
+  shortDescription String?
+  description      String?
+  benefits         String            @default("[]") // JSON string[]
+  howToUse         String?
+  ingredients      String?
+  tags             String            @default("[]") // JSON string[]
+  price            Int
+  compareAtPrice   Int?
+  stock            Int               @default(0)
+  rating           Float?
+  reviewCount      Int               @default(0)
+  active           Boolean           @default(true)
+  isFavorite       Boolean           @default(false)
+  position         Int               @default(0)
+  categoryId       Int?
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  images           ProductImage[]
+  videos           ProductVideo[]
+  related          ProductRelation[] @relation("ProductRelated")
+  relatedBy        ProductRelation[] @relation("RelatedProduct")
+  orderItems       OrderItem[]
+  featuredIn       StoreSettings[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  alt       String?
+  position  Int     @default(0)
+}
+
+model ProductVideo {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  kind      String  @default("youtube") // youtube | file
+  url       String
+  title     String?
+  position  Int     @default(0)
+}
+
+model ProductRelation {
+  productId Int
+  relatedId Int
+  position  Int     @default(0)
+  product   Product @relation("ProductRelated", fields: [productId], references: [id], onDelete: Cascade)
+  related   Product @relation("RelatedProduct", fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@id([productId, relatedId])
+}
+
+/// Páginas de contenido editables: Rutinas, Consejos, Nosotros...
+model Page {
+  id           Int      @id @default(autoincrement())
+  slug         String   @unique
+  title        String
+  subtitle     String?
+  heroImageUrl String?
+  body         String   @default("")
+  position     Int      @default(0)
+  active       Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+}
+
+model MediaAsset {
+  id         Int      @id @default(autoincrement())
+  url        String
+  storageKey String
+  fileName   String
+  mimeType   String
+  size       Int
+  kind       String // image | video
+  alt        String?
+  createdAt  DateTime @default(now())
+}
+
+model AdminUser {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  code            String      @unique
+  status          String      @default("pending") // pending | paid | shipped | delivered | cancelled
+  channel         String      @default("web") // web | whatsapp
+  customerName    String
+  phone           String
+  email           String?
+  address         String?
+  city            String?
+  notes           String?
+  subtotal        Int
+  shipping        Int         @default(0)
+  total           Int
+  paymentProvider String?
+  paymentRef      String?
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  price     Int
+  quantity  Int
+  imageUrl  String?
+}

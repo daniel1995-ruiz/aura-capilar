@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/*
+ * Los valores de marca se inyectan desde la configuración de la tienda (API) en el layout.
+ * Aquí solo existen los valores por defecto.
+ */
+:root {
+  --brand-primary: #2b1e24;
+  --brand-accent: #b7795e;
+  --brand-bg: #faf6f1;
+  --brand-surface: #f1e6dc;
+  --brand-text: #2b1e24;
+}
+
+@theme inline {
+  --color-primary: var(--brand-primary);
+  --color-accent: var(--brand-accent);
+  --color-cream: var(--brand-bg);
+  --color-sand: var(--brand-surface);
+  --color-ink: var(--brand-text);
+  --font-display: var(--font-display-face), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-sans-face), "Jost", system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--brand-bg);
+  color: var(--brand-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand-accent) 30%, transparent);
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.1rem;
+  padding: 0 1.8rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background: var(--brand-primary);
+  color: var(--brand-bg);
+}
+.btn-primary:hover {
+  background: var(--brand-accent);
+}
+.btn-accent {
+  background: var(--brand-accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: var(--brand-primary);
+}
+.btn-outline {
+  border-color: color-mix(in srgb, var(--brand-text) 35%, transparent);
+  color: var(--brand-text);
+}
+.btn-outline:hover {
+  border-color: var(--brand-text);
+  background: var(--brand-text);
+  color: var(--brand-bg);
+}
+
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.35s ease;
+}
+.link-underline:hover,
+.link-underline[aria-current="page"] {
+  background-size: 100% 1px;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.arch {
+  border-radius: 999px 999px 1.5rem 1.5rem;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
